@@ -1,14 +1,15 @@
 import mysql.connector
+import pandas as pd
 
 class DB:
     def __init__(self):
         # connect to the database
         try:
             self.conn = mysql.connector.connect(
-                host='database-1.codzmntflx6t.ap-northeast-1.rds.amazonaws.com',
-                user='admin',
-                password='911Pentagon',
-                database='flights'
+                host='localhost',
+                user='root',
+                password='',
+                database='campusx'
             )
             self.mycursor = self.conn.cursor()
             print('Connection established')
@@ -19,9 +20,9 @@ class DB:
 
         city = []
         self.mycursor.execute("""
-        SELECT DISTINCT(Destination) FROM flights.flights
+        SELECT DISTINCT(Destination) FROM campusx.flights
         UNION
-        SELECT DISTINCT(Source) FROM flights.flights
+        SELECT DISTINCT(Source) FROM campusx.flights
         """)
 
         data = self.mycursor.fetchall()
@@ -34,13 +35,15 @@ class DB:
     def fetch_all_flights(self,source,destination):
 
         self.mycursor.execute("""
-        SELECT Airline,Route,Dep_Time,Duration,Price FROM flights
+        SELECT Airline,Route,Dep_Time,Duration,Price FROM campusx.flights
         WHERE Source = '{}' AND Destination = '{}'
         """.format(source,destination))
 
         data = self.mycursor.fetchall()
 
-        return data
+        df = pd.DataFrame(data , columns=['Airline','Route','Dep_Time','Duration','Price'])
+
+        return df
 
     def fetch_airline_frequency(self):
 
@@ -48,7 +51,7 @@ class DB:
         frequency = []
 
         self.mycursor.execute("""
-        SELECT Airline,COUNT(*) FROM flights
+        SELECT Airline,COUNT(*) FROM campusx.flights
         GROUP BY Airline
         """)
 
@@ -66,9 +69,9 @@ class DB:
         frequency = []
 
         self.mycursor.execute("""
-        SELECT Source,COUNT(*) FROM (SELECT Source FROM flights
+        SELECT Source,COUNT(*) FROM (SELECT Source FROM campusx.flights
 							UNION ALL
-							SELECT Destination FROM flights) t
+							SELECT Destination FROM campusx.flights) t
         GROUP BY t.Source
         ORDER BY COUNT(*) DESC
         """)
@@ -87,7 +90,7 @@ class DB:
         frequency = []
 
         self.mycursor.execute("""
-        SELECT Date_of_Journey,COUNT(*) FROM flights
+        SELECT Date_of_Journey,COUNT(*) FROM campusx.flights
         GROUP BY Date_of_Journey
         """)
 

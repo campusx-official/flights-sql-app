@@ -25,6 +25,7 @@ if user_option == 'Check Flights':
         results = db.fetch_all_flights(source,destination)
         st.dataframe(results)
 
+
 elif user_option == 'Analytics':
     airline, frequency = db.fetch_airline_frequency()
     fig = go.Figure(
